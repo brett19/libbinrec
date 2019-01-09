@@ -8845,7 +8845,7 @@ static inline void translate_insn(
         rtl_add_insn(unit, RTLOP_LOAD, sc_handler, ctx->psb_reg, 0,
                      ctx->handle->setup.state_offset_sc_handler);
         const int new_psb = rtl_alloc_register(unit, RTLTYPE_ADDRESS);
-        rtl_add_insn(unit, RTLOP_CALL, new_psb, sc_handler, ctx->psb_reg, 0);
+        rtl_add_insn(unit, RTLOP_CALL, new_psb, sc_handler, ctx->psb_reg, rtl_imm32(unit, insn));
         post_insn_callback(ctx, address);
         rtl_add_insn(unit, RTLOP_RETURN, 0, new_psb, 0, 0);
         return;
