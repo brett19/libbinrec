@@ -8847,7 +8847,14 @@ static inline void translate_insn(
         const int new_psb = rtl_alloc_register(unit, RTLTYPE_ADDRESS);
         rtl_add_insn(unit, RTLOP_CALL, new_psb, sc_handler, ctx->psb_reg, rtl_imm32(unit, insn));
         post_insn_callback(ctx, address);
+
+        const int same_psb_label = rtl_alloc_label(unit);
+        const int is_same_psb = rtl_alloc_register(unit, RTLTYPE_INT32);
+        rtl_add_insn(unit, RTLOP_SEQ, is_same_psb, ctx->psb_reg, new_psb, 0);
+        rtl_add_insn(unit, RTLOP_GOTO_IF_NZ, 0, is_same_psb, 0, same_psb_label);
         rtl_add_insn(unit, RTLOP_RETURN, 0, new_psb, 0, 0);
+        rtl_add_insn(unit, RTLOP_LABEL, 0, 0, 0, same_psb_label);
+
         return;
       }  // case OPCD_SC
 

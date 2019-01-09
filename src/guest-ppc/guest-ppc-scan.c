@@ -1338,14 +1338,13 @@ bool guest_ppc_scan(GuestPPCContext *ctx, uint32_t limit)
              || ((opcd == OPCD_BC || is_indirect_branch)
                  && (insn_BO(insn) & 0x14) == 0x14));
         const bool is_icbi = (opcd == OPCD_x1F && insn_XO_10(insn) == XO_ICBI);
-        const bool is_sc = (opcd == OPCD_SC);
         /* Also terminate at a GQR write for constant GQR optimization. */
         const bool is_terminal_gqr_write =
             ((ctx->handle->guest_opt & BINREC_OPT_G_PPC_CONSTANT_GQRS)
              && (insn & 0xFC0007FE) == (OPCD_x1F<<26 | XO_MTSPR<<1)
              && (insn_spr(insn) & ~0x17) == SPR_UGQR(0));
         if (is_direct_branch || is_indirect_branch || block->has_trap
-         || is_invalid || is_icbi || is_sc || is_terminal_gqr_write) {
+         || is_invalid || is_icbi || is_terminal_gqr_write) {
             block->len = (address + 4) - block->start;
             block->has_branch = is_direct_branch || is_indirect_branch;
             block->is_conditional_branch =
@@ -1395,7 +1394,7 @@ bool guest_ppc_scan(GuestPPCContext *ctx, uint32_t limit)
              * GQR optimization is enabled) always cause a return from
              * translated code, so they can potentially end the unit as well.
              */
-            if (is_invalid || is_icbi || is_sc || is_terminal_gqr_write
+            if (is_invalid || is_icbi || is_terminal_gqr_write
              || is_unconditional_branch) {
                 ASSERT(ctx->num_blocks > 0);
                 if (ctx->blocks[ctx->num_blocks-1].start <= address) {
